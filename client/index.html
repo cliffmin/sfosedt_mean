@@ -1,0 +1,112 @@
+<!doctype html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <base href="/">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <!-- build:css(client) app/vendor.css -->
+    <!-- bower:css -->
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.css" />
+    <!-- endbower -->
+    <!-- endbuild -->
+    <!-- build:css({.tmp,client}) app/app.css -->
+    <link rel="stylesheet" href="app/app.css">
+    <!-- injector:css -->
+    <link rel="stylesheet" href="app/app.css">
+    <link rel="stylesheet" href="app/main/main.css">
+    <!-- endinjector -->
+    <!-- endbuild -->
+</head>
+
+<body ng-app="fullstackApp">
+
+    <!-- navbar-->
+    <div class="navbar navbar-default navbar-static-top" ng-controller="NavbarCtrl">
+        <div class="container">
+            <div class="navbar-header">
+                <button class="navbar-toggle" type="button" ng-click="isCollapsed = !isCollapsed">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="/" class="navbar-brand">SFOSEDT</a>
+            </div>
+            <div class="row">
+                <div collapse="isCollapsed" class="navbar-collapse collapse" id="navbar-main">
+                    <ul class="nav navbar-nav">
+                        <li ng-repeat="item in menu" ng-class="{active: isActive(item.link)}">
+                            <a ng-href="{{item.link}}">{{item.title}}</a>
+                        </li>
+                    </ul>
+                    <img style="height: 55px; width=70px" class="img-responsive pull-right" src="assets/images/JPL_Logo.png">
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- end navbar-->
+
+    <!-- header -->
+    <header class="hero-unit" id="banner">
+        <div class="container">
+            <div id="time"></div>
+        </div>
+    </header>
+    <!-- end header -->
+<br>
+    <!-- chart -->
+
+    <div id="chart"></div>
+
+
+    <!-- end chart -->
+
+    <!-- footer -->
+    <footer class="footer">
+        <div class="container">
+            <p><a href="https://twitter.com/bbtone">@cliffmin</a> |
+                <a href="https://github.com/DaftMonk/generator-angular-fullstack/issues?state=open">Issues</a>
+            </p>
+        </div>
+    </footer>
+    <!-- end footer -->
+
+    <!-- Add your site or application content here -->
+    <!--     <div ng-view=""></div>
+ -->
+
+
+    <!-- build:js(client) app/vendor.js -->
+    <!-- bower:js -->
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-resource/angular-resource.js"></script>
+    <script src="bower_components/angular-cookies/angular-cookies.js"></script>
+    <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+    <script src="bower_components/angular-route/angular-route.js"></script>
+    <script src="bower_components/lodash/dist/lodash.compat.js"></script>
+    <script src="bower_components/d3/d3.min.js"></script>
+    <script src="bower_components/underscore/underscore.js"></script>
+    <!-- endbower -->
+    <!-- endbuild -->
+    <script src="bower_components/timely/timely.js"></script>
+
+    <!-- build:js({.tmp,client}) app/app.js -->
+    <script src="app/app.js"></script>
+    <!-- injector:js -->
+    <script src="app/main/main.controller.js"></script>
+    <script src="app/main/main.js"></script>
+    <script src="components/navbar/navbar.controller.js"></script>
+    <!-- endinjector -->
+    <!-- endbuild -->
+    <script src="app/scripts/lib/mainChart.js"></script>
+
+</body>
+
+</html>
