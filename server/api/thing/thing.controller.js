@@ -9,29 +9,21 @@
 
 'use strict';
 
-var _ = require('lodash');
-
 // Get list of things
 exports.index = function(req, res) {
-  res.json([
-  {
-  name : 'Development Tools',
-  info : 'Integration with popular tools such as Bower, Grunt, Karma, Mocha, JSHint, Node Inspector, Livereload, Protractor, Jade, Stylus, Sass, CoffeeScript, and Less.'
-  }, {
-  name : 'Server and Client integration',
-  info : 'Built with a powerful and fun stack: MongoDB, Express, AngularJS, and Node.'
-  }, {
-  name : 'Smart Build System',
-  info : 'Build system ignores `spec` files, allowing you to keep tests alongside code. Automatic injection of scripts and styles into your index.html'
-  },  {
-  name : 'Modular Structure',
-  info : 'Best practice client and server structures allow for more code reusability and maximum scalability'
-  },  {
-  name : 'Optimized Build',
-  info : 'Build process packs up your templates as a single JavaScript payload, minifies your scripts/css/images, and rewrites asset names for caching.'
-  },{
-  name : 'Deployment Ready',
-  info : 'Easily deploy your app to Heroku or Openshift with the heroku and openshift subgenerators'
-  }
-  ]);
+
+    res.json((function() {
+        var myString = "D 10 0 2013-085T23:30:00 2013-086T07:00:00 3 0 14 1024 8 0 0 0 '25 (0085)' 0";
+        myString = myString.split(/\s/);
+        return {
+            start: myString[2],
+            end: myString[3],
+            user: myString[13] + myString[14]
+        }
+    })());
+
 };
+
+ // D 10 0 2013-085T23:30:00 2013-086T07:00:00 3 0 14 1024 8 0 0 0 "25 (0085)" 0
+ // D 10 0 2013-085T06:00:00 2013-085T10:50:00 3 0 112 1024 8 0 0 0 "45 (0085)" 0
+ // D 10 0 2013-085T17:35:00 2013-085T23:40:00 3 0 210 1024 8 0 0 0 "55 (0085)" 0
