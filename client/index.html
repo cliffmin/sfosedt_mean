@@ -23,7 +23,7 @@
     <!-- endbuild -->
 </head>
 
-<body ng-app="fullstackApp">
+<body onLoad="main()" ng-app="fullstackApp">
 
     <!-- navbar-->
     <div class="navbar navbar-default navbar-static-top" ng-controller="NavbarCtrl">
@@ -91,10 +91,10 @@
     <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
     <script src="bower_components/angular-route/angular-route.js"></script>
     <script src="bower_components/lodash/dist/lodash.compat.js"></script>
-    <script src="bower_components/d3/d3.min.js"></script>
-    <script src="bower_components/underscore/underscore.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
+    <script src="bower_components/d3/d3.min.js"></script>
+    <script src="bower_components/underscore/underscore.js"></script>
     <script src="bower_components/timely/timely.js"></script>
 
     <!-- build:js({.tmp,client}) app/app.js -->
@@ -102,6 +102,7 @@
     <!-- injector:js -->
     <script src="app/main/main.controller.js"></script>
     <script src="app/main/main.js"></script>
+    <script src="app/scripts/lib/mainChart.js"></script>
     <script src="components/navbar/navbar.controller.js"></script>
     <!-- endinjector -->
     <!-- endbuild -->

@@ -374,7 +374,6 @@ function offsetMinutes(date, minutes) {
     return new Date(date.getTime() + minutes * 60 * 1000)
 }
 
-main();
 
 //yaml markup
 //web server to serve file
