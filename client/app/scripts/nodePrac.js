@@ -13,38 +13,148 @@
 // };
 
 //break into events sections and toss into function
+
+
+// var myNewArray = [];
+// var fs = require('fs');
+
+// function readLines(input, func) {
+//   var remaining = '';
+
+//   input.on('data', function(data) {
+//     remaining += data;
+//     var index = remaining.indexOf('\n');
+//     var last  = 0;
+//     while (index > -1) {
+//       var line = remaining.substring(last, index);
+//       last = index + 1;
+//       func(line);
+//       index = remaining.indexOf('\n', last);
+//     }
+
+//     remaining = remaining.substring(last);
+//   });
+
+//   input.on('end', function() {
+//     if (remaining.length > 0) {
+//       func(remaining);
+//     }
+//   });
+// }
+
+// function func(data){
+//     console.log(data);
+// }
+
+// var input = fs.createReadStream('lib/dc057a.02.sfos');
+// readLines(input, func);
+
 'use strict';
 
-var myString = "D 10 0 2013-085T23:30:00 2013-086T07:00:00 3 0 14 1024 8 0 0 0 '25 (0085)' 0 D 10 0 2013-085T06:00:00 2013-085T10:50:00 3 0 112 1024 8 0 0 0 '45 (0085)' 0 D 10 0 2013-085T17:35:00 2013-085T23:40:00 3 0 210 1024 8 0 0 0 '55 (0085)' 0";
-
-// myString = myString.split(/\s/);
-// myArray = [];
-// myString = myString.slice(0, 12);
-// myArray.push((function(myString) {
-//     return {
-//         'type': myString[0],
-//         'start': myString[3],
-//         'end': myString[4]
-//     }
-// })(myString));
-// console.log(myArray);
-var myArray = [];
+var fs = require('fs');
 
 
 
-function eventsParser(myString) {
-    var myString = myString.split(/\s/);
-    for (var i = 0; i < myString.length; i++) {
-        if (myString[i] === 'D') {
-            myArray.push((function(thisArray) {
-                    return {
-                        'type': thisArray[0],
-                        'start': thisArray[3],
-                        'end': thisArray[4]
-                    }
-                })(myString.slice(i, i + 11)))
-            }
+
+fs.readFile('lib/dc057a.02.sfos', function(err, f) {
+    var sfosArray = f.toString().split('\n');
+    console.log(eventsParser(sfosArray, sectionIndexes));
+});
+
+//gets section indexes for the sfos array
+function sectionIndexes(array) {
+    var historyIndex = null;
+    var setupIndex = null;
+    var pageIndex = null;
+    var formatIndex = null;
+    var eventsIndex = null;
+    var eofIndex = null;
+    for (var i = 0; i < array.length; i++) {
+        if (array[i] === '$$HISTORY') {
+            historyIndex = i;
+        } else if (array[i] === '$$SETUP') {
+            setupIndex = i;
+        } else if (array[i] === '$$PAGE') {
+            pageIndex = i;
+        } else if (array[i] === '$$FORMAT') {
+            formatIndex = i;
+        } else if (array[i] === '$$EVENTS') {
+            eventsIndex = i;
+        } else if (array[i] === '$$EOF') {
+            eofIndex = i;
         }
     }
-    eventsParser(myString);
-console.log(myArray)
+    return {
+        'historyIndex': historyIndex,
+        'setupIndex': setupIndex,
+        'pageIndex': pageIndex,
+        'formatIndex': formatIndex,
+        'eventsIndex': eventsIndex,
+        'eofIndex': eofIndex
+    }
+}
+
+function eventsParser(sfosArray, sectionIndexes) {
+    var sfosIndexes = sectionIndexes(sfosArray);
+    var eventsArray = {
+        'D': [],
+        'P': [],
+        'V': [],
+        'E': []
+
+    };
+
+    for (var i = sfosIndexes.eventsIndex; i < sfosIndexes.eofIndex; i++) {
+        switch (sfosArray[i].charAt(0)) {
+            case 'D':
+                {
+                    eventsArray.D.push((function(thisArray, length) {
+                        return {
+                            'type': thisArray[0],
+                            'start': thisArray[3],
+                            'end': thisArray[4],
+                            'text': thisArray[length - 3] + thisArray[length - 2]
+                        }
+                    })(sfosArray[i].split(/\s/), sfosArray[i].split(/\s/).length))
+                }
+                break;
+            case 'P':
+                {
+                    eventsArray.P.push((function(thisArray, length) {
+                        return {
+                            'type': thisArray[0],
+                            'time': thisArray[3],
+                            'text': thisArray[length - 6] + thisArray[length - 5] + thisArray[length - 4]
+                        }
+                    })(sfosArray[i].split(/\s/), sfosArray[i].split(/\s/).length))
+                }
+                break;
+            case 'V':
+                {
+                    eventsArray.V.push((function(thisArray, length) {
+                        return {
+                            'type': thisArray[0],
+                            'start': thisArray[3],
+                            'end': thisArray[4],
+                            'text': thisArray[length - 6] + ' ' + thisArray[length - 5] + ' ' + thisArray[length - 4] + ' ' + thisArray[length - 3] + ' ' + thisArray[length - 2]
+                        }
+                    })(sfosArray[i].split(/\s/), sfosArray[i].split(/\s/).length))
+                }
+                break;
+            case 'E':
+                {
+                    eventsArray.E.push((function(thisArray, length) {
+                        return {
+                            'type': thisArray[0],
+                            'time': thisArray[3],
+                            'text': thisArray[length - 2]
+                        }
+                    })(sfosArray[i].split(/\s/), sfosArray[i].split(/\s/).length))
+                }
+                break;
+        }
+    }
+    return eventsArray;
+}
+
+// arrayOfLines = lineString.match(/[^\r\n]+/g);
