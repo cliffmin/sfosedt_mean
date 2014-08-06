@@ -100,12 +100,16 @@ function eventsParser(sfosArray, sectionIndexes) {
         'D': [],
         'P': [],
         'V': [],
-        'E': []
-
+        'E': [],
+        'Q': [],
+        'eventsNumber': 0,
+        'matchesSFOS': null
     };
+    var currLine = "";
 
     for (var i = sfosIndexes.eventsIndex; i < sfosIndexes.eofIndex; i++) {
-        switch (sfosArray[i].charAt(0)) {
+        currLine = sfosArray[i];
+        switch (currLine.charAt(0)) {
             case 'D':
                 {
                     eventsArray.D.push((function(thisArray, length) {
@@ -115,45 +119,61 @@ function eventsParser(sfosArray, sectionIndexes) {
                             'end': thisArray[4],
                             'text': thisArray[length - 3] + thisArray[length - 2]
                         }
-                    })(sfosArray[i].split(/\s/), sfosArray[i].split(/\s/).length))
+                    })(currLine))
                 }
                 break;
             case 'P':
                 {
-                    eventsArray.P.push((function(thisArray, length) {
+                    eventsArray.P.push((function(lineString) {
                         return {
-                            'type': thisArray[0],
-                            'time': thisArray[3],
-                            'text': thisArray[length - 6] + thisArray[length - 5] + thisArray[length - 4]
+                            'type': lineString.charAt(0),
+                            'time': lineString.match(/\d\d\d\d-.+T\d\d:\d\d:\d\d/).join() || 'no value found',
+                            'text': lineString.match(/".*"/).join().split(/"\s"/)[0] || 'no value found',
+                            'legendText': lineString.match(/".*"/).join().split(/"\s"/)[1] || 'no value found',
+                            'label': lineString.match(/".*"/).join().split(/" "/)[0] + ' | ' + lineString.match(/".*"/).join().split(/" "/)[1] || 'no value found'
                         }
-                    })(sfosArray[i].split(/\s/), sfosArray[i].split(/\s/).length))
+                    })(currLine))
                 }
                 break;
             case 'V':
                 {
-                    eventsArray.V.push((function(thisArray, length) {
+                    eventsArray.V.push((function(lineString) {
                         return {
-                            'type': thisArray[0],
-                            'start': thisArray[3],
-                            'end': thisArray[4],
-                            'text': thisArray[length - 6] + ' ' + thisArray[length - 5] + ' ' + thisArray[length - 4] + ' ' + thisArray[length - 3] + ' ' + thisArray[length - 2]
+                            'type': lineString.charAt(0),
+                            'start': lineString.match(/\d\d\d\d-.+T\d\d:\d\d:\d\d/).join().split(/\s/)[0] || 'no value found',
+                            'end': lineString.match(/\d\d\d\d-.+T\d\d:\d\d:\d\d/).join().split(/\s/)[1] || 'no value found',
+                            'text': lineString.match(/".+"/).join() || 'no value found'
+
                         }
-                    })(sfosArray[i].split(/\s/), sfosArray[i].split(/\s/).length))
+                    })(currLine))
                 }
                 break;
             case 'E':
                 {
-                    eventsArray.E.push((function(thisArray, length) {
+                    eventsArray.E.push((function(lineString) {
                         return {
-                            'type': thisArray[0],
-                            'time': thisArray[3],
-                            'text': thisArray[length - 2]
+                            'type': lineString.charAt(0) || 'no value found',
+                            'time': lineString.match(/\d\d\d\d-.+T\d\d:\d\d:\d\d/).join() || 'no value found',
+                            'text': lineString.match(/".+"/).join() || 'no value found'
                         }
-                    })(sfosArray[i].split(/\s/), sfosArray[i].split(/\s/).length))
+                    })(currLine))
+                }
+                break;
+            case 'Q':
+                {
+                    eventsArray.Q.push((function(lineString) {
+                        return {
+                            'type': lineString.charAt(0) || 'no value found',
+                            'time': lineString.match(/\d\d\d\d-.+T\d\d+:\d\d:\d\d/).join() || 'no value found',
+                            'text': lineString.match(/".+"/).join() || 'no value found'
+                        }
+                    })(currLine))
                 }
                 break;
         }
     }
+    //storing the amount of read events to match input file
+    eventsArray.eventsNumber = eventsArray.D.length + eventsArray.E.length + eventsArray.P.length + eventsArray.Q.length + eventsArray.V.length;
     return eventsArray;
 }
 
