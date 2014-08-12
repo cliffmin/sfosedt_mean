@@ -1,73 +1,27 @@
-// exports.index = function(req, res) {
-
-//     res.json((function() {
-//         var myString = "D 10 0 2013-085T23:30:00 2013-086T07:00:00 3 0 14 1024 8 0 0 0 '25 (0085)' 0";
-//         myString = myString.split(/\s/);
-//         return {
-//             start: myString[2],
-//             end: myString[3],
-//             user: myString[13] + myString[14]
-//         }
-//     })());
-
-// };
-
-//break into events sections and toss into function
-
-
-// var myNewArray = [];
-// var fs = require('fs');
-
-// function readLines(input, func) {
-//   var remaining = '';
-
-//   input.on('data', function(data) {
-//     remaining += data;
-//     var index = remaining.indexOf('\n');
-//     var last  = 0;
-//     while (index > -1) {
-//       var line = remaining.substring(last, index);
-//       last = index + 1;
-//       func(line);
-//       index = remaining.indexOf('\n', last);
-//     }
-
-//     remaining = remaining.substring(last);
-//   });
-
-//   input.on('end', function() {
-//     if (remaining.length > 0) {
-//       func(remaining);
-//     }
-//   });
-// }
-
-// function func(data){
-//     console.log(data);
-// }
-
-// var input = fs.createReadStream('lib/dc057a.02.sfos');
-// readLines(input, func);
+/**
+ * Using Rails-like standard naming convention for endpoints.
+ * GET     /things              ->  index
+ * POST    /things              ->  create
+ * GET     /things/:id          ->  show
+ * PUT     /things/:id          ->  update
+ * DELETE  /things/:id          ->  destroy
+ */
 
 'use strict';
 
-//make sfos class, make an object
-//work on prototype and add the parser to the object
-//bring out events to display through the object
+var fs = require('fs');
+var filePath = 'dc057a.02.sfos';
 
-
-
-
-function sfosParser(){
-    var fs = require('fs');
-    fs.readFile('lib/dc057a.02.sfos', function(err, f) {
-            var sfosArray = f.toString().split('\n');
-            return {
-                events: eventsParser(sfosArray, sectionIndexes)
-        }
-    });
+//main sfos parser, will split into other sections
+function sfosParser(filePath) {
+    //can make an sfos object here
+    var data = fs.readFileSync(filePath).toString().split('\n');
+    data = eventsParser(data, sectionIndexes);
+    return data
 }
-sfosParser();
+
+console.log(sfosParser(filePath));
+
 //gets section indexes for the sfos array
 function sectionIndexes(array) {
     var historyIndex = null;
@@ -124,6 +78,22 @@ function eventsParser(sfosArray, sectionIndexes) {
                             'type': currLine.charAt(0),
                             'start': lineString.match(/\d\d\d\d-.+T\d\d:\d\d:\d\d/).join().split(/\s/)[0] || 'no value found',
                             'end': lineString.match(/\d\d\d\d-.+T\d\d:\d\d:\d\d/).join().split(/\s/)[1] || 'no value found',
+                            'ant': function(lineString) {
+                                switch (lineString.match(/".*"/).join().charAt(1)) {
+                                    case '1':
+                                    case '2':
+                                        return 'goldstone'
+                                        break;
+                                    case '3':
+                                    case '4':
+                                        return 'madrid'
+                                        break;
+                                    case '5':
+                                    case '6':
+                                        return 'canberra'
+                                        break;
+                                }
+                            }(lineString),
                             'text': currLine.match(/".*"/).join() || 'no value found'
                         }
                     })(currLine))
@@ -147,6 +117,19 @@ function eventsParser(sfosArray, sectionIndexes) {
                     eventsArray.V.push((function(lineString) {
                         return {
                             'type': lineString.charAt(0),
+                            'ant': function(lineString) {
+                                switch (lineString.match(/".*"/).join().charAt(1)) {
+                                    case '1':
+                                        return 'goldstone'
+                                        break;
+                                    case '4':
+                                        return 'madrid'
+                                        break;
+                                    case '6':
+                                        return 'canberra'
+                                        break;
+                                }
+                            }(lineString),
                             'start': lineString.match(/\d\d\d\d-.+T\d\d:\d\d:\d\d/).join().split(/\s/)[0] || 'no value found',
                             'end': lineString.match(/\d\d\d\d-.+T\d\d:\d\d:\d\d/).join().split(/\s/)[1] || 'no value found',
                             'text': lineString.match(/".+"/).join() || 'no value found'
