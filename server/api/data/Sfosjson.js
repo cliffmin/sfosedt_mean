@@ -9,9 +9,11 @@
 
 'use strict';
 
+//eventually place methods into the Sfosjson prototype
+
 var fs = require('fs');
 
-//main sfos parser, will split into other sections
+//our exposed constructor
 exports.Sfosjson = function Sfosjson(pathFile) {
     //can make an sfos object here
     this.data = sfosParser(pathFile)

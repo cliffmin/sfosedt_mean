@@ -100,6 +100,11 @@ var events = {
 //come from?
 
 function main() {
+
+    $.getJSON('api/data').done(function(d) {
+        console.log(d.data['header']);
+        document.getElementById('sfosheader').innerHTML = d.data.header;
+    });
     document.getElementById('time').innerHTML = events.SETUP['TIME'];
     var chartSpec = {
         element: document.getElementById('chart'),
