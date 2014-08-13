@@ -100,192 +100,190 @@ var events = {
 //come from?
 
 function main() {
-
     $.getJSON('api/data').done(function(d) {
-        console.log(d.data['header']);
-        document.getElementById('sfosheader').innerHTML = d.data.header;
+            var sfosData = d.data;
+            document.getElementById('time').innerHTML = events.SETUP['TIME'];
+            var chartSpec = {
+                element: document.getElementById('chart'),
+                data: {
+                    parameterEvents: sfosData.events.P,
+                    dsnEvents: sfosData.events.D,
+                    modeEvents: events['modeEvents']
+                },
+                rows: [{
+                    title: 'Spacecraft States',
+                    layers: [{
+                        type: 'symbol',
+                        color: 'blue',
+                        shape: 'diamond',
+                        from: 'parameterEvents',
+                        mappings: function(d) {
+                            return {
+                                x: utc(d.time),
+                                y: 'temp',
+                                text: d.label
+                            }
+                        },
+                        adjustments: function(item) {
+                            var size = Math.min(18, item.size);
+                            return {
+                                y: item.y + size * 0.05,
+                                size: size * 0.9
+                            };
+                        }
+                    }, {
+                        type: 'label',
+                        from: 'parameterEvents',
+                        mappings: function(d) {
+                            return {
+                                x: utc(d.time),
+                                y: d.state,
+                                text: d.text,
+                                fill: d.color
+                            }
+                        },
+                        adjustments: function(item) {
+                            var size = Math.min(18, item.size);
+                            return {
+                                y: item.y + size * 0.05,
+                                size: size * 0.9
+                            };
+                        }
+                    }]
+                }, {
+                    title: 'TLM Output Mode',
+                    layers: [{
+                        type: 'symbol',
+                        shape: 'diamond',
+                        from: 'modeEvents',
+                        mappings: function(d) {
+                            return {
+                                x: utc(d.time),
+                                y: d.state,
+                                text: d.text,
+                                fill: d.color
+                            }
+                        },
+                        adjustments: function(item) {
+                            var size = Math.min(18, item.size);
+                            return {
+                                y: item.y + size * 0.05,
+                                size: size * 0.9
+                            };
+                        }
+                    }, {
+                        type: 'label',
+                        from: 'modeEvents',
+                        mappings: function(d) {
+                            return {
+                                x: utc(d.time),
+                                y: d.state,
+                                text: d.text,
+                                fill: d.color
+                            }
+                        },
+                        adjustments: function(item) {
+                            var size = Math.min(18, item.size);
+                            return {
+                                y: item.y + size * 0.05,
+                                size: size * 0.9
+                            };
+                        }
+                    }]
+                }, {
+                    title: 'DSN Coverage',
+                    mappings: function(d) {
+                        return {
+                            x: utc(d.start),
+                            x2: utc(d.end)
+                        };
+                    },
+                    layers: [{
+                        type: 'rect',
+                        from: 'dsnEvents',
+                        mappings: function(d) {
+                            return {
+                                x: utc(d.start),
+                                x2: utc(d.end),
+                                y: d.ant,
+                                fill: d.color
+                            }
+                        }
+                    }, {
+                        type: 'label',
+                        from: 'dsnEvents',
+                        mappings: function(d) {
+                            return {
+                                x: utc(d.start),
+                                x2: utc(d.end),
+                                y: d.ant,
+                                text: d.user,
+                                fill: d.color
+                            }
+                        },
+                        adjustments: function(item) {
+                            var size = Math.min(18, item.size);
+                            return {
+                                y: item.y + size * 0.05,
+                                size: size * 0.9
+                            };
+                        }
+                    }, {
+                        type: 'label',
+                        from: 'dsnEvents',
+                        anchor: 'right',
+                        fill: 'none',
+                        maxItems: 50,
+                        mappings: function(d) {
+                            return {
+                                text: d3.time.format.utc('%H:%M')(utc(d.start)),
+                                x: utc(d.start),
+                                y: d.ant
+                            };
+                        },
+                        adjustments: function(d) {
+                            return {
+                                // Slightly shrink the start/end times relative to the main labels
+                                size: d.size * 0.4,
+                            };
+                        }
+                    }, {
+                        type: 'label',
+                        from: 'dsnEvents',
+                        anchor: 'left',
+                        fill: 'none',
+                        maxItems: 50,
+                        mappings: function(d) {
+                            return {
+                                text: d3.time.format.utc('%H:%M')(utc(d.end)),
+                                x: utc(d.end),
+                                y: d.ant
+                            };
+                        },
+                        adjustments: function(d) {
+                            return {
+                                // Slightly shrink the start/end times relative to the main labels
+                                size: d.size * 0.4,
+                            };
+                        }
+                    }]
+                }]
+            }
+            var chart = new Timely.Chart(chartSpec);
+            var $win = $(window);
+
+            function redraw() {
+                chart.setWidth($win.width() - 50)
+                    .setHeight($win.height() - 170)
+                    .draw();
+            }
+
+            $win.resize(redraw);
+
+            redraw();
     });
-    document.getElementById('time').innerHTML = events.SETUP['TIME'];
-    var chartSpec = {
-        element: document.getElementById('chart'),
-        data: {
-            parameterEvents: events['parameterEvents'],
-            dsnEvents: events['dsnEvents'],
-            modeEvents: events['modeEvents']
-        },
-        rows: [{
-            title: 'Spacecraft States',
-            layers: [{
-                type: 'symbol',
-                color: 'blue',
-                shape: 'diamond',
-                from: 'parameterEvents',
-                mappings: function(d) {
-                    return {
-                        x: utc(d.time),
-                        y: d.state,
-                        text: d.text,
-                        fill: d.color
-                    }
-                },
-                adjustments: function(item) {
-                    var size = Math.min(18, item.size);
-                    return {
-                        y: item.y + size * 0.05,
-                        size: size * 0.9
-                    };
-                }
-            }, {
-                type: 'label',
-                from: 'parameterEvents',
-                mappings: function(d) {
-                    return {
-                        x: utc(d.time),
-                        y: d.state,
-                        text: d.text,
-                        fill: d.color
-                    }
-                },
-                adjustments: function(item) {
-                    var size = Math.min(18, item.size);
-                    return {
-                        y: item.y + size * 0.05,
-                        size: size * 0.9
-                    };
-                }
-            }]
-        }, {
-            title: 'TLM Output Mode',
-            layers: [{
-                type: 'symbol',
-                shape: 'diamond',
-                from: 'modeEvents',
-                mappings: function(d) {
-                    return {
-                        x: utc(d.time),
-                        y: d.state,
-                        text: d.text,
-                        fill: d.color
-                    }
-                },
-                adjustments: function(item) {
-                    var size = Math.min(18, item.size);
-                    return {
-                        y: item.y + size * 0.05,
-                        size: size * 0.9
-                    };
-                }
-            }, {
-                type: 'label',
-                from: 'modeEvents',
-                mappings: function(d) {
-                    return {
-                        x: utc(d.time),
-                        y: d.state,
-                        text: d.text,
-                        fill: d.color
-                    }
-                },
-                adjustments: function(item) {
-                    var size = Math.min(18, item.size);
-                    return {
-                        y: item.y + size * 0.05,
-                        size: size * 0.9
-                    };
-                }
-            }]
-        }, {
-            title: 'DSN Coverage',
-            mappings: function(d) {
-                return {
-                    x: utc(d.start),
-                    x2: utc(d.end)
-                };
-            },
-            layers: [{
-                type: 'rect',
-                from: 'dsnEvents',
-                mappings: function(d) {
-                    return {
-                        x: utc(d.start),
-                        x2: utc(d.end),
-                        y: d.ant,
-                        fill: d.color
-                    }
-                }
-            }, {
-                type: 'label',
-                from: 'dsnEvents',
-                mappings: function(d) {
-                    return {
-                        x: utc(d.start),
-                        x2: utc(d.end),
-                        y: d.ant,
-                        text: d.user,
-                        fill: d.color
-                    }
-                },
-                adjustments: function(item) {
-                    var size = Math.min(18, item.size);
-                    return {
-                        y: item.y + size * 0.05,
-                        size: size * 0.9
-                    };
-                }
-            }, {
-                type: 'label',
-                from: 'dsnEvents',
-                anchor: 'right',
-                fill: 'none',
-                maxItems: 50,
-                mappings: function(d) {
-                    return {
-                        text: d3.time.format.utc('%H:%M')(utc(d.start)),
-                        x: utc(d.start),
-                        y: d.ant
-                    };
-                },
-                adjustments: function(d) {
-                    return {
-                        // Slightly shrink the start/end times relative to the main labels
-                        size: d.size * 0.4,
-                    };
-                }
-            }, {
-                type: 'label',
-                from: 'dsnEvents',
-                anchor: 'left',
-                fill: 'none',
-                maxItems: 50,
-                mappings: function(d) {
-                    return {
-                        text: d3.time.format.utc('%H:%M')(utc(d.end)),
-                        x: utc(d.end),
-                        y: d.ant
-                    };
-                },
-                adjustments: function(d) {
-                    return {
-                        // Slightly shrink the start/end times relative to the main labels
-                        size: d.size * 0.4,
-                    };
-                }
-            }]
-        }]
-    }
-    var chart = new Timely.Chart(chartSpec);
-    var $win = $(window);
+}
 
-    function redraw() {
-        chart.setWidth($win.width() - 50)
-            .setHeight($win.height() - 170)
-            .draw();
-    }
-
-    $win.resize(redraw);
-
-    redraw();
-};
 
 
 function row(category, label) {
