@@ -14,9 +14,7 @@ var fs = require('fs');
 //main sfos parser, will split into other sections
 exports.Sfosjson = function Sfosjson(pathFile) {
     //can make an sfos object here
-    var data = fs.readFileSync(pathFile).toString().split('\n');
-    data = sfosParser(data, getSectionIndexes);
-    return data;
+    this.data = sfosParser(pathFile)
 }
 
 //helper function that gets section indexes for the sfos array
@@ -54,9 +52,18 @@ function getSectionIndexes(array) {
 
 
 //returns sfos object
-function sfosParser(sfosArray, getSectionIndexes) {
+function sfosParser(sfosPathFile) {
+    var sfosArray = fs.readFileSync(sfosPathFile).toString().split('\n');
+
     var sfosIndexes = getSectionIndexes(sfosArray);
-    var eventsArray = {
+    var headerProperties = (function(startIndex, endIndex) {
+        var headerString = '';
+        for (var j = startIndex; j < endIndex; j++) {
+            headerString += (sfosArray[j] + ' \n ');
+        }
+        return headerString;
+    })(0, sfosIndexes.historyIndex);
+    var eventsArray = { //init empty arrays to push onto
         'D': [],
         'P': [],
         'V': [],
@@ -65,11 +72,10 @@ function sfosParser(sfosArray, getSectionIndexes) {
         'eventsNumber': 0, //set initially 0 for read events
         'matchesSFOS': false //set initially false
     };
-    var currLine = '';//set initially to an empty string
-
-    for (var i = sfosIndexes.eventsIndex; i < sfosIndexes.eofIndex; i++) {
+    var currLine = ''; //set initially to an empty string
+    for (var i = sfosIndexes.eventsIndex; i < sfosIndexes.eofIndex; i++) { //build events
         currLine = sfosArray[i];
-        switch (currLine.charAt(0)) {
+        switch (currLine.charAt(0)) { //read line type at the beginning of line
             case 'D':
                 {
                     eventsArray.D.push((function(lineString) {
@@ -164,6 +170,8 @@ function sfosParser(sfosArray, getSectionIndexes) {
     //storing the amount of read events to match input file
     eventsArray.eventsNumber = eventsArray.D.length + eventsArray.E.length + eventsArray.P.length + eventsArray.Q.length + eventsArray.V.length;
     eventsArray.matchesSFOS = (eventsArray.eventsNumber === (sfosIndexes.eofIndex - sfosIndexes.eventsIndex - 1));
-    return eventsArray;
+    return {
+        header: headerProperties,
+        events: eventsArray
+    }
 }
-
