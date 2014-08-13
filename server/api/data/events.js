@@ -10,20 +10,17 @@
 'use strict';
 
 var fs = require('fs');
-var filePath = 'dc057a.02.sfos';
 
 //main sfos parser, will split into other sections
-function sfosParser(filePath) {
+exports.Sfosjson = function Sfosjson(pathFile) {
     //can make an sfos object here
-    var data = fs.readFileSync(filePath).toString().split('\n');
-    data = eventsParser(data, sectionIndexes);
-    return data
+    var data = fs.readFileSync(pathFile).toString().split('\n');
+    data = sfosParser(data, getSectionIndexes);
+    return data;
 }
 
-console.log(sfosParser(filePath));
-
-//gets section indexes for the sfos array
-function sectionIndexes(array) {
+//helper function that gets section indexes for the sfos array
+function getSectionIndexes(array) {
     var historyIndex = null;
     var setupIndex = null;
     var pageIndex = null;
@@ -54,9 +51,11 @@ function sectionIndexes(array) {
         'eofIndex': eofIndex
     }
 }
-//returns eventsArray object
-function eventsParser(sfosArray, sectionIndexes) {
-    var sfosIndexes = sectionIndexes(sfosArray);
+
+
+//returns sfos object
+function sfosParser(sfosArray, getSectionIndexes) {
+    var sfosIndexes = getSectionIndexes(sfosArray);
     var eventsArray = {
         'D': [],
         'P': [],
@@ -66,7 +65,7 @@ function eventsParser(sfosArray, sectionIndexes) {
         'eventsNumber': 0, //set initially 0 for read events
         'matchesSFOS': false //set initially false
     };
-    var currLine = '';
+    var currLine = '';//set initially to an empty string
 
     for (var i = sfosIndexes.eventsIndex; i < sfosIndexes.eofIndex; i++) {
         currLine = sfosArray[i];
@@ -167,3 +166,4 @@ function eventsParser(sfosArray, sectionIndexes) {
     eventsArray.matchesSFOS = (eventsArray.eventsNumber === (sfosIndexes.eofIndex - sfosIndexes.eventsIndex - 1));
     return eventsArray;
 }
+

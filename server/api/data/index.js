@@ -1,9 +1,7 @@
-//default endpoint for reference
-
 'use strict';
 
 var express = require('express');
-var controller = require('./thing.controller');
+var controller = require('./data.controller');
 
 var router = express.Router();
 
