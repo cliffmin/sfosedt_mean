@@ -56,15 +56,22 @@ function getSectionIndexes(array) {
 //returns sfos object
 function sfosParser(sfosPathFile) {
     var sfosArray = fs.readFileSync(sfosPathFile).toString().split('\n');
-
     var sfosIndexes = getSectionIndexes(sfosArray);
-    var headerProperties = (function(startIndex, endIndex) {
-        var headerString = '';
-        for (var j = startIndex; j < endIndex; j++) {
-            headerString += (sfosArray[j] + ' \n ');
-        }
-        return headerString;
-    })(0, sfosIndexes.historyIndex);
+    return {
+        header: headerBuilder(sfosArray, sfosIndexes),
+        events: eventsBuilder(sfosArray, sfosIndexes)
+    }
+}
+
+function headerBuilder(sfosArray, sfosIndexes) {
+    var headerString = '';
+    for (var j = 0; j < sfosIndexes.historyIndex; j++) {
+        headerString += (sfosArray[j] + ' \n ');
+    }
+    return headerString;
+}
+
+function eventsBuilder(sfosArray, sfosIndexes) {
     var eventsArray = { //init empty arrays to push onto
         'D': [],
         'P': [],
@@ -82,9 +89,6 @@ function sfosParser(sfosPathFile) {
                 {
                     eventsArray.D.push((function(lineString) {
                         return {
-                            'type': currLine.charAt(0),
-                            'start': lineString.match(/\d\d\d\d-.+T\d\d:\d\d:\d\d/).join().split(/\s/)[0] || 'no value found',
-                            'end': lineString.match(/\d\d\d\d-.+T\d\d:\d\d:\d\d/).join().split(/\s/)[1] || 'no value found',
                             'ant': function(lineString) {
                                 switch (lineString.match(/".*"/).join().charAt(1)) {
                                     case '1':
@@ -99,8 +103,13 @@ function sfosParser(sfosPathFile) {
                                     case '6':
                                         return 'canberra'
                                         break;
+                                    default:
+                                        break;
                                 }
                             }(lineString),
+                            'type': currLine.charAt(0),
+                            'start': lineString.match(/\d\d\d\d-.+T\d\d:\d\d:\d\d/).join().split(/\s/)[0] || 'no value found',
+                            'end': lineString.match(/\d\d\d\d-.+T\d\d:\d\d:\d\d/).join().split(/\s/)[1] || 'no value found',
                             'text': currLine.match(/".*"/).join() || 'no value found'
                         }
                     })(currLine))
@@ -172,8 +181,5 @@ function sfosParser(sfosPathFile) {
     //storing the amount of read events to match input file
     eventsArray.eventsNumber = eventsArray.D.length + eventsArray.E.length + eventsArray.P.length + eventsArray.Q.length + eventsArray.V.length;
     eventsArray.matchesSFOS = (eventsArray.eventsNumber === (sfosIndexes.eofIndex - sfosIndexes.eventsIndex - 1));
-    return {
-        header: headerProperties,
-        events: eventsArray
-    }
+    return eventsArray
 }
