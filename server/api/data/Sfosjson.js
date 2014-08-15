@@ -26,29 +26,25 @@ exports.Sfosjson = function Sfosjson(pathFile) {
 function sfosParser(sfosPathFile) {
     var sfosArray = fs.readFileSync(sfosPathFile).toString().split('\n');
     var sfosIndexes = getSectionIndexes(sfosArray);
+    var headerSection = sfosArray.slice(0, sfosIndexes.historyIndex).join(' ');
+    console.log(headerSection);
     return {
-        header: headerBuilder(sfosArray, sfosIndexes),
+        header: headerBuilder(headerSection),
         events: eventsBuilder(sfosArray, sfosIndexes)
     }
 }
 
-function headerBuilder(sfosArray, sfosIndexes) {
-    var headerString = '';
-    var startTime = '';
-    var stopTime = '';
-    for (var j = 0; j < sfosIndexes.historyIndex; j++) {
-        headerString += (sfosArray[j] + ' \n ');
-        if (sfosArray[j].match(/^APPLICABLE_START_TIME*/)) {
-            startTime = sfosArray[j].match(/(?:APPLICABLE_START_TIME = )(.*)(?:;)/)[1];
-        } else if (sfosArray[j].match(/^APPLICABLE_STOP_TIME.*/)) {
-            stopTime = sfosArray[j].match(/(?:APPLICABLE_STOP_TIME = )(.*)(?:;)/)[1];
+function headerBuilder(sfosString) {
+        return {
+        sfduHeader: sfosString.split(' ')[0],
+        missionName: sfosString.match(/(?:MISSION_NAME = )(.*)(?:;)/)[1],
+        spaceCraftName: sfosString.match(/(?:SPACECRAFT_NAME = )(.*)(?:;)/)[1],
+        dsnSpaceCraftNum:sfosString.match(/(?:DSN_SPACECRAFT_NAME = )(.*)(?:;)/)[1],
+        fileName: sfosString.match(/(?:FILE_NAME = )(.*)(?:;)/)[1],
+        startTime: sfosString.match(/(?:APPLICABLE_START_TIME = )(.*)(?:;)/)[1],
+        stopTime: sfosString.match(/(?:APPLICABLE_STOP_TIME = )(.*)(?:;)/)[1],
+        creationTime: sfosString.match(/(?:PRODUCT_CREATION_TIME = )(.*)(?:;)/)[1],
         }
-    }
-    return {
-        headerString: headerString,
-        startTime: startTime,
-        stopTime: stopTime
-    }
 }
 
 function eventsBuilder(sfosArray, sfosIndexes) {
