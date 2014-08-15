@@ -25,54 +25,16 @@
 
 <body onLoad="main()" ng-app="fullstackApp">
 
-    <!-- navbar-->
-    <div class="navbar navbar-default navbar-static-top" ng-controller="NavbarCtrl">
-        <div class="container">
-            <div class="navbar-header">
-                <button class="navbar-toggle" type="button" ng-click="isCollapsed = !isCollapsed">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a href="/" class="navbar-brand">SFOSEDT</a>
-            </div>
-            <div class="row">
-                <div collapse="isCollapsed" class="navbar-collapse collapse" id="navbar-main">
-                    <ul class="nav navbar-nav">
-                        <li ng-repeat="item in menu" ng-class="{active: isActive(item.link)}">
-                            <a ng-href="{{item.link}}">{{item.title}}</a>
-                        </li>
-                    </ul>
-                    <img style="height: 55px; width=70px" class="img-responsive pull-right" src="assets/images/JPL_Logo.png">
-                </div>
-            </div>
+ <div ng-view=""></div>
 
-        </div>
-    </div>
-    <!-- end navbar-->
-
-    <!-- header -->
-    <header class="hero-unit" id="banner">
-        <div class="container">
-            <div id="time"></div>
-            <div id="sfosheader"></div>
-        </div>
-    </header>
-    <!-- end header -->
-<br>
-    <!-- chart -->
-
-    <div id="chart"></div>
-
-
-    <!-- end chart -->
 
     <!-- footer -->
     <footer class="footer">
         <div class="container">
-            <p><a href="https://twitter.com/bbtone">@cliffmin</a> |
-                <a href="https://github.com/DaftMonk/generator-angular-fullstack/issues?state=open">Issues</a>
+            <p><a href="https://github.com/cliffmin">@cliffmin</a> |
+                <a href="https://github.jpl.nasa.gov/SEQR/timely/wiki">Timely</a> |
+                <a href="https://docs.angularjs.org/api">AngularJS</a> |
+                <a href="https://www.npmjs.org/package/generator-angular-fullstack">Fullstack</a>
             </p>
         </div>
     </footer>
@@ -94,6 +56,7 @@
     <script src="bower_components/lodash/dist/lodash.compat.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
+    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="bower_components/d3/d3.min.js"></script>
     <script src="bower_components/underscore/underscore.js"></script>
     <script src="bower_components/timely/timely.js"></script>
@@ -107,7 +70,6 @@
     <script src="components/navbar/navbar.controller.js"></script>
     <!-- endinjector -->
     <!-- endbuild -->
-    <script src="app/scripts/lib/mainChart.js"></script>
 
 </body>
 

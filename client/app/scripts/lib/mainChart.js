@@ -6,43 +6,45 @@
 function main() {
     $.getJSON('api/data').done(function(d) {
         var sfosData = d.data;
+        var startTime = utc(sfosData.header.startTime);
+        var stopTime = utc(sfosData.header.stopTime);
         console.log(sfosData);
-        // document.getElementById('time').innerHTML = events.SETUP['TIME'];
+        document.getElementById('time').innerHTML = startTime + ' - ' + stopTime;
         var chartSpec = {
             element: document.getElementById('chart'),
             data: {
-                parameterEvents: sfosData.events.P,
                 dsnEvents: sfosData.events.D,
+                parameterEvents: sfosData.events.P,
             },
             rows: [{
-                title: 'DSN Coverage',
-                mappings: function(d) {
-                    return {
-                        x: utc(d.start),
-                        x2: utc(d.end)
-                    };
-                },
+                title: 'Spacecraft States',
                 layers: [{
-                    type: 'rect',
-                    from: 'dsnEvents',
+                    type: 'symbol',
+                    color: 'blue',
+                    shape: 'diamond',
+                    from: 'parameterEvents',
                     mappings: function(d) {
                         return {
-                            x: utc(d.start),
-                            x2: utc(d.end),
-                            text: d.text,
-                            y: d.ant,
-                            fill: d.color
+                            x: utc(d.time),
+                            y: 'temp',
+                            text: d.label
                         }
+                    },
+                    adjustments: function(item) {
+                        var size = Math.min(18, item.size);
+                        return {
+                            y: item.y + size * 0.05,
+                            size: size * 0.9
+                        };
                     }
                 }, {
                     type: 'label',
-                    from: 'dsnEvents',
+                    from: 'parameterEvents',
                     mappings: function(d) {
                         return {
-                            x: utc(d.start),
-                            x2: utc(d.end),
-                            y: d.ant,
-                            text: d.user,
+                            x: utc(d.time),
+                            y: d.state,
+                            text: d.text,
                             fill: d.color
                         }
                     },
@@ -52,6 +54,49 @@ function main() {
                             y: item.y + size * 0.05,
                             size: size * 0.9
                         };
+                    }
+                }]
+            }, {
+                title: 'DSN Coverage',
+                layers: [{
+                    type: 'label',
+                    from: 'dsnEvents',
+                    mappings: function(d) {
+                        return {
+                            y: d.ant,
+                            text: d.text,
+                        }
+                    },
+                    adjustments: function(item) {
+                        var size = Math.min(18, item.size);
+                        return {
+                            y: item.y + size * 0.05,
+                            size: size * 0.9
+                        };
+                    }
+                }, {
+                    type: 'rect',
+                    from: 'dsnEvents',
+                    mappings: function(d) {
+                        return {
+                            x: utc(d.start),
+                            x2: utc(d.end),
+                            y: d.ant,
+                            text: d.text,
+                            fill: (function() {
+                                switch (d.ant) {
+                                    case 'goldstone':
+                                        return '#99CCFF'
+                                        break;
+                                    case 'canberra':
+                                        return '#FF9147'
+                                        break;
+                                    case 'madrid':
+                                        return '#FFFF99'
+                                        break;
+                                }
+                            })(d)
+                        }
                     }
                 }, {
                     type: 'label',
@@ -187,4 +232,3 @@ var utc = (function() {
 function offsetMinutes(date, minutes) {
     return new Date(date.getTime() + minutes * 60 * 1000)
 }
-

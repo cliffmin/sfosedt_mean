@@ -9,7 +9,10 @@
 
 'use strict';
 
+
+//D 07 0 2013-085T10:15:37 2013-120T05:24:48 3 0 4 1024 8 0 0 0 "dc057a" 0, need to fix for not registering these events
 //eventually place methods into the Sfosjson prototype
+//do try catch around fs read
 
 var fs = require('fs');
 
@@ -18,40 +21,6 @@ exports.Sfosjson = function Sfosjson(pathFile) {
     //can make an sfos object here
     this.data = sfosParser(pathFile)
 }
-
-//helper function that gets section indexes for the sfos array
-function getSectionIndexes(array) {
-    var historyIndex = null;
-    var setupIndex = null;
-    var pageIndex = null;
-    var formatIndex = null;
-    var eventsIndex = null;
-    var eofIndex = null;
-    for (var i = 0; i < array.length; i++) {
-        if (array[i] === '$$HISTORY') {
-            historyIndex = i;
-        } else if (array[i] === '$$SETUP') {
-            setupIndex = i;
-        } else if (array[i] === '$$PAGE') {
-            pageIndex = i;
-        } else if (array[i] === '$$FORMAT') {
-            formatIndex = i;
-        } else if (array[i] === '$$EVENTS') {
-            eventsIndex = i;
-        } else if (array[i] === '$$EOF') {
-            eofIndex = i;
-        }
-    }
-    return {
-        'historyIndex': historyIndex,
-        'setupIndex': setupIndex,
-        'pageIndex': pageIndex,
-        'formatIndex': formatIndex,
-        'eventsIndex': eventsIndex,
-        'eofIndex': eofIndex
-    }
-}
-
 
 //returns sfos object
 function sfosParser(sfosPathFile) {
@@ -65,10 +34,22 @@ function sfosParser(sfosPathFile) {
 
 function headerBuilder(sfosArray, sfosIndexes) {
     var headerString = '';
+    var startTime = '';
+    var stopTime = '';
     for (var j = 0; j < sfosIndexes.historyIndex; j++) {
         headerString += (sfosArray[j] + ' \n ');
+        if(sfosArray[j].match(/^APPLICABLE_START_TIME*/)){
+            startTime = sfosArray[j].match(/(?:APPLICABLE_START_TIME = )(.*)(?:;)/)[1];
+        }
+        else if(sfosArray[j].match(/^APPLICABLE_STOP_TIME.*/)){
+            stopTime = sfosArray[j].match(/(?:APPLICABLE_STOP_TIME = )(.*)(?:;)/)[1];
+        }
     }
-    return headerString;
+    return {
+    headerString: headerString,
+    startTime: startTime,
+    stopTime: stopTime
+    }
 }
 
 function eventsBuilder(sfosArray, sfosIndexes) {
@@ -182,4 +163,37 @@ function eventsBuilder(sfosArray, sfosIndexes) {
     eventsArray.eventsNumber = eventsArray.D.length + eventsArray.E.length + eventsArray.P.length + eventsArray.Q.length + eventsArray.V.length;
     eventsArray.matchesSFOS = (eventsArray.eventsNumber === (sfosIndexes.eofIndex - sfosIndexes.eventsIndex - 1));
     return eventsArray
+}
+
+//helper function that gets section indexes for the sfos array
+function getSectionIndexes(array) {
+    var historyIndex = null;
+    var setupIndex = null;
+    var pageIndex = null;
+    var formatIndex = null;
+    var eventsIndex = null;
+    var eofIndex = null;
+    for (var i = 0; i < array.length; i++) {
+        if (array[i] === '$$HISTORY') {
+            historyIndex = i;
+        } else if (array[i] === '$$SETUP') {
+            setupIndex = i;
+        } else if (array[i] === '$$PAGE') {
+            pageIndex = i;
+        } else if (array[i] === '$$FORMAT') {
+            formatIndex = i;
+        } else if (array[i] === '$$EVENTS') {
+            eventsIndex = i;
+        } else if (array[i] === '$$EOF') {
+            eofIndex = i;
+        }
+    }
+    return {
+        'historyIndex': historyIndex,
+        'setupIndex': setupIndex,
+        'pageIndex': pageIndex,
+        'formatIndex': formatIndex,
+        'eventsIndex': eventsIndex,
+        'eofIndex': eofIndex
+    }
 }
