@@ -2,7 +2,7 @@
 
 
 
-var dataURL = 'api/things';
+var dataURL = 'api/viewFile';
 
 
 angular.module('fullstackApp')
@@ -13,7 +13,7 @@ angular.module('fullstackApp')
 
         function formatStringIntoHtml(dataURL) {
             $.getJSON(dataURL).done(function(d) {
-                var dataArray = d;
+                var dataArray = d.data;
                 var returnHtmlString = '';
                 for (var i = 0; i < dataArray.length; i++) {
                     returnHtmlString += (dataArray[i] + ' <br> ')
