@@ -19,14 +19,19 @@
     <!-- injector:css -->
     <link rel="stylesheet" href="app/app.css">
     <link rel="stylesheet" href="app/main/main.css">
+    <link rel="stylesheet" href="app/view/view.css">
     <!-- endinjector -->
     <!-- endbuild -->
 </head>
 
-<body onLoad="main()" ng-app="fullstackApp">
+<body ng-app="fullstackApp">
+    <!-- navbar -->
+    <div ng-include="'components/navbar/navbar.html'"></div>
+    <!-- end navbar -->
 
- <div ng-view=""></div>
-
+    <!-- application body-->
+    <div ng-view=""></div>
+    <!-- end application -->
 
     <!-- footer -->
     <footer class="footer">
@@ -66,7 +71,8 @@
     <!-- injector:js -->
     <script src="app/main/main.controller.js"></script>
     <script src="app/main/main.js"></script>
-    <script src="app/scripts/lib/mainChart.js"></script>
+    <script src="app/view/view.controller.js"></script>
+    <script src="app/view/view.js"></script>
     <script src="components/navbar/navbar.controller.js"></script>
     <!-- endinjector -->
     <!-- endbuild -->

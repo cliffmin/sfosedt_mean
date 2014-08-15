@@ -1,18 +1,16 @@
-<div ng-include="'components/navbar/navbar.html'"></div>
-
+<div ng-controller="MainCtrl">
 
     <!-- header -->
     <header class="hero-unit" id="banner">
         <div class="container">
             <div id="time"></div>
-
         </div>
     </header>
     <!-- end header -->
-<br>
+
+    <br>
+
     <!-- chart -->
-
-    <div id="chart"></div>
-
-
+    <div id="chart" ng-init="main()"></div>
     <!-- end chart -->
+</div>

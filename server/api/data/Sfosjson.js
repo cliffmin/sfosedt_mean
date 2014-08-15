@@ -19,7 +19,7 @@ var fs = require('fs');
 //our exposed constructor
 exports.Sfosjson = function Sfosjson(pathFile) {
     //can make an sfos object here
-    this.data = sfosParser(pathFile)
+    this.jsonData = sfosParser(pathFile);
 }
 
 //returns sfos object
@@ -38,17 +38,16 @@ function headerBuilder(sfosArray, sfosIndexes) {
     var stopTime = '';
     for (var j = 0; j < sfosIndexes.historyIndex; j++) {
         headerString += (sfosArray[j] + ' \n ');
-        if(sfosArray[j].match(/^APPLICABLE_START_TIME*/)){
+        if (sfosArray[j].match(/^APPLICABLE_START_TIME*/)) {
             startTime = sfosArray[j].match(/(?:APPLICABLE_START_TIME = )(.*)(?:;)/)[1];
-        }
-        else if(sfosArray[j].match(/^APPLICABLE_STOP_TIME.*/)){
+        } else if (sfosArray[j].match(/^APPLICABLE_STOP_TIME.*/)) {
             stopTime = sfosArray[j].match(/(?:APPLICABLE_STOP_TIME = )(.*)(?:;)/)[1];
         }
     }
     return {
-    headerString: headerString,
-    startTime: startTime,
-    stopTime: stopTime
+        headerString: headerString,
+        startTime: startTime,
+        stopTime: stopTime
     }
 }
 
