@@ -10,7 +10,8 @@ angular.module('fullstackApp')
                 var startTime = utc(sfosData.header.startTime);
                 var stopTime = utc(sfosData.header.stopTime);
                 console.log(sfosData);
-                document.getElementById('time').innerHTML = startTime + ' - ' + stopTime;
+                document.getElementById('fileName').innerHTML = 'MISSION NAME: ' + sfosData.header.missionName;
+                document.getElementById('fileTime').innerHTML = startTime + ' - ' + stopTime;
                 var chartSpec = {
                     element: document.getElementById('chart'),
                     data: {

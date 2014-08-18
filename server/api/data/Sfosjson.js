@@ -26,8 +26,7 @@ exports.Sfosjson = function Sfosjson(pathFile) {
 function sfosParser(sfosPathFile) {
     var sfosArray = fs.readFileSync(sfosPathFile).toString().split('\n');
     var sfosIndexes = getSectionIndexes(sfosArray);
-    var headerSection = sfosArray.slice(0, sfosIndexes.historyIndex).join(' ');
-    console.log(headerSection);
+    var headerSection = sfosArray.slice(0, sfosIndexes.historyIndex).join('\n');
     return {
         header: headerBuilder(headerSection),
         events: eventsBuilder(sfosArray, sfosIndexes)
@@ -37,13 +36,13 @@ function sfosParser(sfosPathFile) {
 function headerBuilder(sfosString) {
         return {
         sfduHeader: sfosString.split(' ')[0],
-        missionName: sfosString.match(/(?:MISSION_NAME = )(.*)(?:;)/)[1],
-        spaceCraftName: sfosString.match(/(?:SPACECRAFT_NAME = )(.*)(?:;)/)[1],
-        dsnSpaceCraftNum:sfosString.match(/(?:DSN_SPACECRAFT_NAME = )(.*)(?:;)/)[1],
-        fileName: sfosString.match(/(?:FILE_NAME = )(.*)(?:;)/)[1],
-        startTime: sfosString.match(/(?:APPLICABLE_START_TIME = )(.*)(?:;)/)[1],
-        stopTime: sfosString.match(/(?:APPLICABLE_STOP_TIME = )(.*)(?:;)/)[1],
-        creationTime: sfosString.match(/(?:PRODUCT_CREATION_TIME = )(.*)(?:;)/)[1],
+        missionName: sfosString.match(/(?:MISSION_NAME\s*=\s*([^;]+);)/)[1],
+        spaceCraftName: sfosString.match(/(?:SPACECRAFT_NAME\s*=\s*([^;]+);)/)[1],
+        dsnSpaceCraftNum:sfosString.match(/(?:DSN_SPACECRAFT_NUM\s*=\s*([^;]+);)/)[1],
+        fileName: sfosString.match(/(?:FILE_NAME\s*=\s*([^;]+);)/)[1],
+        startTime: sfosString.match(/(?:APPLICABLE_START_TIME\s*=\s*([^;]+);)/)[1],
+        stopTime: sfosString.match(/(?:APPLICABLE_STOP_TIME\s*=\s*([^;]+);)/)[1],
+        creationTime: sfosString.match(/(?:PRODUCT_CREATION_TIME\s*=\s*([^;]+);)/)[1],
         }
 }
 
