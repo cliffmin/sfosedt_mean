@@ -146,7 +146,7 @@ angular.module('fullstackApp')
 
                 function redraw() {
                     chart.setWidth($win.width() - 50)
-                        .setHeight($win.height() - 170)
+                        .setHeight($win.height() - 250)
                         .draw();
                 }
 

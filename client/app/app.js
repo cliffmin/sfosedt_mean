@@ -16,6 +16,10 @@ angular.module('fullstackApp', [
                 templateUrl: 'app/view/view.html',
                 controller: 'ViewCtrl'
             })
+            .when('/about', {
+                templateUrl: 'app/about/about.html',
+                controller: 'AboutCtrl'
+            })
             .otherwise({
                 redirectTo: '/'
             });
