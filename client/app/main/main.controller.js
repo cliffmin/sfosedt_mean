@@ -16,130 +16,175 @@ angular.module('fullstackApp')
                     element: document.getElementById('chart'),
                     data: {
                         dsnEvents: sfosData.events.D,
+                        qEvents: sfosData.events.Q,
                         parameterEvents: sfosData.events.P,
                     },
                     rows: [{
-                        title: 'Spacecraft States',
-                        layers: [{
-                            type: 'symbol',
-                            color: 'blue',
-                            shape: 'diamond',
-                            from: 'parameterEvents',
-                            mappings: function(d) {
-                                return {
-                                    x: utc(d.time),
-                                    y: 'temp',
-                                    text: d.label
+                            title: 'Spacecraft States',
+                            layers: [{
+                                type: 'symbol',
+                                color: 'blue',
+                                shape: 'diamond',
+                                from: 'parameterEvents',
+                                mappings: function(d) {
+                                    return {
+                                        x: utc(d.time),
+                                        y: 'temp',
+                                        text: d.label
+                                    }
+                                },
+                                adjustments: function(item) {
+                                    var size = Math.min(18, item.size);
+                                    return {
+                                        y: item.y + size * 0.05,
+                                        size: size * 0.9
+                                    };
                                 }
-                            },
-                            adjustments: function(item) {
-                                var size = Math.min(18, item.size);
-                                return {
-                                    y: item.y + size * 0.05,
-                                    size: size * 0.9
-                                };
-                            }
+                            }, {
+                                type: 'label',
+                                from: 'parameterEvents',
+                                mappings: function(d) {
+                                    return {
+                                        x: utc(d.time),
+                                        y: d.state,
+                                        text: d.text,
+                                        fill: d.color
+                                    }
+                                },
+                                adjustments: function(item) {
+                                    var size = Math.min(18, item.size);
+                                    return {
+                                        y: item.y + size * 0.05,
+                                        size: size * 0.9
+                                    };
+                                }
+                            }]
                         }, {
-                            type: 'label',
-                            from: 'parameterEvents',
-                            mappings: function(d) {
-                                return {
-                                    x: utc(d.time),
-                                    y: d.state,
-                                    text: d.text,
-                                    fill: d.color
-                                }
-                            },
-                            adjustments: function(item) {
-                                var size = Math.min(18, item.size);
-                                return {
-                                    y: item.y + size * 0.05,
-                                    size: size * 0.9
-                                };
-                            }
-                        }]
-                    }, {
-                        title: 'DSN Coverage',
-                        layers: [{
-                            type: 'label',
-                            from: 'dsnEvents',
-                            mappings: function(d) {
-                                return {
-                                    y: d.ant,
-                                    text: d.text,
-                                }
-                            },
-                            adjustments: function(item) {
-                                var size = Math.min(18, item.size);
-                                return {
-                                    y: item.y + size * 0.05,
-                                    size: size * 0.9
-                                };
-                            }
-                        }, {
-                            type: 'rect',
-                            from: 'dsnEvents',
-                            mappings: function(d) {
-                                return {
-                                    x: utc(d.start),
-                                    x2: utc(d.end),
-                                    y: d.ant,
-                                    text: d.text,
-                                    fill: (function() {
-                                        switch (d.ant) {
-                                            case 'goldstone':
-                                                return '#99CCFF'
-                                                break;
-                                            case 'canberra':
-                                                return '#FF9147'
-                                                break;
-                                            case 'madrid':
-                                                return '#FFFF99'
-                                                break;
+                            title: 'TLM Output Modes',
+                            layers: [{
+                                    type: 'rect',
+                                    color: 'blue',
+                                    from: 'qEvents',
+                                    mappings: function(d) {
+                                        return {
+                                            x: utc(d.time),
+                                            y: d.y,
                                         }
-                                    })(d)
+                                    },
+                                    adjustments: function(item) {
+                                        var size = Math.min(18, item.size);
+                                        return {
+                                            y: item.y + size * 0.05,
+                                            size: size * 0.9
+                                        };
+                                    }
+                                }, {
+                                    type: 'label',
+                                    from: 'qEvents',
+                                    mappings: function(d) {
+                                        return {
+                                            x: utc(d.time),
+                                            y: d.y,
+                                            text: d.text,
+                                        }
+                                    },
+                                    adjustments: function(item) {
+                                        var size = Math.min(18, item.size);
+                                        return {
+                                            y: item.y + size * 0.05,
+                                            size: size * 0.9
+                                        };
+                                    }
                                 }
-                            }
-                        }, {
-                            type: 'label',
-                            from: 'dsnEvents',
-                            anchor: 'right',
-                            fill: 'none',
-                            maxItems: 50,
-                            mappings: function(d) {
-                                return {
-                                    text: d3.time.format.utc('%H:%M')(utc(d.start)),
-                                    x: utc(d.start),
-                                    y: d.ant
-                                };
-                            },
-                            adjustments: function(d) {
-                                return {
-                                    // Slightly shrink the start/end times relative to the main labels
-                                    size: d.size * 0.4,
-                                };
-                            }
-                        }, {
-                            type: 'label',
-                            from: 'dsnEvents',
-                            anchor: 'left',
-                            fill: 'none',
-                            maxItems: 50,
-                            mappings: function(d) {
-                                return {
-                                    text: d3.time.format.utc('%H:%M')(utc(d.end)),
-                                    x: utc(d.end),
-                                    y: d.ant
-                                };
-                            },
-                            adjustments: function(d) {
-                                return {
-                                    // Slightly shrink the start/end times relative to the main labels
-                                    size: d.size * 0.4,
-                                };
-                            }
-                        }]
-                    }]
+
+
+                            ]
+                        },
+
+
+                        {
+                            title: 'DSN Coverage',
+                            layers: [{
+                                type: 'label',
+                                from: 'dsnEvents',
+                                mappings: function(d) {
+                                    return {
+                                        y: d.ant,
+                                        text: d.text,
+                                    }
+                                },
+                                adjustments: function(item) {
+                                    var size = Math.min(18, item.size);
+                                    return {
+                                        y: item.y + size * 0.05,
+                                        size: size * 0.9
+                                    };
+                                }
+                            }, {
+                                type: 'rect',
+                                from: 'dsnEvents',
+                                mappings: function(d) {
+                                    return {
+                                        x: utc(d.start),
+                                        x2: utc(d.end),
+                                        y: d.ant,
+                                        text: d.text,
+                                        fill: (function() {
+                                            switch (d.ant) {
+                                                case 'goldstone':
+                                                    return '#99CCFF'
+                                                    break;
+                                                case 'canberra':
+                                                    return '#FF9147'
+                                                    break;
+                                                case 'madrid':
+                                                    return '#FFFF99'
+                                                    break;
+                                            }
+                                        })(d)
+                                    }
+                                }
+                            }, {
+                                type: 'label',
+                                from: 'dsnEvents',
+                                anchor: 'right',
+                                fill: 'none',
+                                maxItems: 50,
+                                mappings: function(d) {
+                                    return {
+                                        text: d3.time.format.utc('%H:%M')(utc(d.start)),
+                                        x: utc(d.start),
+                                        y: d.ant
+                                    };
+                                },
+                                adjustments: function(d) {
+                                    return {
+                                        // Slightly shrink the start/end times relative to the main labels
+                                        size: d.size * 0.4,
+                                    };
+                                }
+                            }, {
+                                type: 'label',
+                                from: 'dsnEvents',
+                                anchor: 'left',
+                                fill: 'none',
+                                maxItems: 50,
+                                mappings: function(d) {
+                                    return {
+                                        text: d3.time.format.utc('%H:%M')(utc(d.end)),
+                                        x: utc(d.end),
+                                        y: d.ant
+                                    };
+                                },
+                                adjustments: function(d) {
+                                    return {
+                                        // Slightly shrink the start/end times relative to the main labels
+                                        size: d.size * 0.4,
+                                    };
+                                }
+                            }]
+                        }
+                    ]
                 }
                 var chart = new Timely.Chart(chartSpec);
                 var $win = $(window);

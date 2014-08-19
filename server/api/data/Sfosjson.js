@@ -34,16 +34,16 @@ function sfosParser(sfosPathFile) {
 }
 
 function headerBuilder(sfosString) {
-        return {
+    return {
         sfduHeader: sfosString.split(' ')[0],
         missionName: sfosString.match(/(?:MISSION_NAME\s*=\s*([^;]+);)/)[1],
         spaceCraftName: sfosString.match(/(?:SPACECRAFT_NAME\s*=\s*([^;]+);)/)[1],
-        dsnSpaceCraftNum:sfosString.match(/(?:DSN_SPACECRAFT_NUM\s*=\s*([^;]+);)/)[1],
+        dsnSpaceCraftNum: sfosString.match(/(?:DSN_SPACECRAFT_NUM\s*=\s*([^;]+);)/)[1],
         fileName: sfosString.match(/(?:FILE_NAME\s*=\s*([^;]+);)/)[1],
         startTime: sfosString.match(/(?:APPLICABLE_START_TIME\s*=\s*([^;]+);)/)[1],
         stopTime: sfosString.match(/(?:APPLICABLE_STOP_TIME\s*=\s*([^;]+);)/)[1],
         creationTime: sfosString.match(/(?:PRODUCT_CREATION_TIME\s*=\s*([^;]+);)/)[1],
-        }
+    }
 }
 
 function eventsBuilder(sfosArray, sfosIndexes) {
@@ -146,7 +146,20 @@ function eventsBuilder(sfosArray, sfosIndexes) {
                         return {
                             'type': lineString.charAt(0) || 'no value found',
                             'time': lineString.match(/\d\d\d\d-.+T\d\d+:\d\d:\d\d/).join() || 'no value found',
-                            'text': lineString.match(/".+"/).join() || 'no value found'
+                            'text': lineString.match(/".+"/).join() || 'no value found',
+                            'y': function(lineString) {
+                                if (lineString.match(/Thrust/)) {
+                                    return 'THRUST'
+                                } else if (lineString.match(/\+/)) {
+                                    return 'ANTENNA'
+                                } else if (lineString.match(/"40"/)) {
+                                    return 'TLM BIT RATE'
+                                } else if (lineString.match(/BPS/)) {
+                                    return 'UL BIT RATE'
+                                } else {
+                                    return 'ACS MODE'
+                                }
+                            }(lineString)
                         }
                     })(currLine))
                 }
