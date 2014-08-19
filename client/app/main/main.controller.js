@@ -1,5 +1,7 @@
 'use strict';
 
+//dcastill jpl, star modules documentation
+
 angular.module('fullstackApp')
     .controller('MainCtrl', function($scope, $http) {
         $scope.awesomeThings = [];

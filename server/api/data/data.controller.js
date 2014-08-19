@@ -5,7 +5,7 @@ var Sfosjson = require('./Sfosjson');
 var fs = require('fs');
 
 
-var pathFile = 'server/backend/dc057a.02.sfos';
+var pathFile = 'server/backend/aSol563_int_seq.sfos';
 
 // Get list of datas
 exports.index = function(req, res) {

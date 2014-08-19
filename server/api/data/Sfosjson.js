@@ -29,7 +29,8 @@ function sfosParser(sfosPathFile) {
     var headerSection = sfosArray.slice(0, sfosIndexes.historyIndex).join('\n');
     return {
         header: headerBuilder(headerSection),
-        events: eventsBuilder(sfosArray, sfosIndexes)
+        events: eventsBuilder(sfosArray, sfosIndexes),
+        sfosFile: sfosArray
     }
 }
 
