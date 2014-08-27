@@ -18,4 +18,10 @@ angular.module('fullstackApp')
         $scope.isActive = function(route) {
             return route === $location.path();
         };
+
+        $scope.backendList = function(){
+            return $.getJSON('api/data').done(function(d) {
+                return d.backendDataFiles
+            })
+        }()
     });

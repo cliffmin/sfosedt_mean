@@ -14,15 +14,19 @@
 //eventually place methods into the Sfosjson prototype
 //do try catch around fs read
 
+
+
+//THIS IS OUR BACKEND CONSTRUCTOR, MOST OF THE HEAVY LIFTING IN CLEANING/PARSING THE DATA HAPPENS HERE
+
 var fs = require('fs');
 
 //our exposed constructor
 exports.Sfosjson = function Sfosjson(pathFile) {
-    //can make an sfos object here
+    this.backendDataFiles = fs.readdirSync('server/backend');//gets list of backend files
     this.jsonData = sfosParser(pathFile);
 }
 
-//returns sfos object
+//primary function, returns sfos object to constructor
 function sfosParser(sfosPathFile) {
     var sfosArray = fs.readFileSync(sfosPathFile).toString().split('\n');
     var sfosIndexes = getSectionIndexes(sfosArray);
@@ -55,6 +59,7 @@ function eventsBuilder(sfosArray, sfosIndexes) {
         'E': [],
         'Q': [],
         'eventsNumber': 0, //set initially 0 for read events
+        'sfosEventsNumber': (sfosIndexes.eofIndex - sfosIndexes.eventsIndex - 2),
         'matchesSFOS': false //set initially false
     };
     var currLine = ''; //set initially to an empty string
@@ -169,7 +174,7 @@ function eventsBuilder(sfosArray, sfosIndexes) {
     }
     //storing the amount of read events to match input file
     eventsArray.eventsNumber = eventsArray.D.length + eventsArray.E.length + eventsArray.P.length + eventsArray.Q.length + eventsArray.V.length;
-    eventsArray.matchesSFOS = (eventsArray.eventsNumber === (sfosIndexes.eofIndex - sfosIndexes.eventsIndex - 1));
+    eventsArray.matchesSFOS = (eventsArray.eventsNumber === eventsArray.sfosEventsNumber);
     return eventsArray
 }
 
